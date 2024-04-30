@@ -1,0 +1,56 @@
+Spring Security & JWT 사용 개요
+
+1. 클래스 설명
+
+    1-1 기본컴포넌트
+
+    UserEntity:
+        목적: 사용자 정보를 데이터베이스에 저장.
+
+        사용자 정보를 DB에 저장합니다. 필드로는 username, password, role 등이 있습니다.
+
+    UserDTO:
+        목적: 데이터 전송 객체. 주로 사용자 등록 시 사용.
+        데이터 전송 객체로, 주로 사용자 등록에 사용됩니다. username과 password 필드를 포함합니다.
+
+    UserRepository:
+        목적: JPA를 이용한 UserEntity 관리.
+        JPA를 이용해 UserEntity 관리. 사용자 이름 존재 여부 확인, 사용자 정보 검색 등의 기능 제공.
+
+    CustomUserDetails:
+        목적: UserDetails 인터페이스 구현을 통해 Spring Security에서 사용자 인증 정보를 관리.
+        사용자의 권한, 비밀번호, 활성 상태 등을 제공.
+
+    1-2 서비스 레이어
+        UserService (인터페이스):
+        목적: 사용자 관리 기능 정의.
+        사용자 등록 함수를 정의합니다.
+
+        UserServiceImpl (구현 클래스):
+        목적: UserService의 구현체.
+        사용자를 DB에 저장하고, loadUserByUsername 메소드를 통해 사용자 인증 정보를 로드합니다. 비밀번호는 BCryptPasswordEncoder를 사용해 암호화합니다.
+
+3. 보안 설정 (SecurityConfig)
+
+    CSRF:
+        JWT 사용으로 인해 CSRF 보호는 필요 없으므로 비활성화합니다.
+
+    AuthenticationManager:
+        목적: 인증 프로세스 관리.
+        Spring Security의 인증 프로세스를 관리합니다.
+
+    SecurityFilterChain:
+        요청에 따른 접근 제어 정책 설정. /login, /join은 누구나 접근 가능하며, /admin은 ADMIN 역할 사용자만 접근 가능.
+
+4. 로그인 필터 (LoginFilter)
+    기능:
+        사용자 로그인 시도 시 호출되는 필터. UsernamePasswordAuthenticationFilter를 상속받아 구현.
+
+    작동 방식:
+        로그인 시 username과 password를 받아 UsernamePasswordAuthenticationToken을 생성하고,
+        AuthenticationManager를 통해 사용자를 인증합니다.
+
+    인증 후 처리:
+        successfulAuthentication에서 JWT 토큰을 생성하고 응답에 포함시켜야 하며, 현재는 이 부분의 구현이 필요합니다.
+    5. JWT 토큰 관리
+
